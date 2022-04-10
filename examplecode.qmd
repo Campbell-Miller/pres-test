@@ -1,0 +1,171 @@
+---
+title: "`cron`"
+format:
+  revealjs:
+    theme: night
+    transition: fade
+---
+
+## Introduction
+
+```{r}
+#| label: packages-and-settings
+#| echo: false
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE,
+                      cache = TRUE
+                      )
+```
+
+`cron` is a command-line "utility" (a tool we can access from the command-line/shell) for scheduling "jobs".
+
+::: nonincremental
+-   *Jobs* = any command or script of code that you have written, which
+    -   you want to run repetitively\
+    -   at some specified time, or date, or both\
+:::
+
+## Installation 1
+
+Your Linux distro should have some form of `cron` installed by default.
+
+::: nonincremental
+-   If you're using *Ubuntu*, you can follow the easy instructions [here](https://www.digitalocean.com/community/tutorials/how-to-use-cron-to-automate-tasks-ubuntu-1804).\
+-   I found that the latest version of `cron` was already installed on my Windows machine.\
+:::
+
+OVERALL: Easy to moderate setup
+
+## Installation 2
+
+![](imgs/sc2-install-steps.png)
+
+## Overview
+
+::: nonincremental
+Each user on your computer can have a unique **crontab** file, which stores the scheduled *jobs* you have created.
+
+-   This file is not meant to be edited directly, but through `cron` expressions (commands) entered from you shell.\
+-   The **crontab** commands allow us to create and edit our `cron` *jobs*.
+:::
+
+## Why cron?
+
+::: nonincremental
+-   Automated backups, syncing files between machines.
+-   Automated version control
+-   Automated scripts - R, Python, etc.
+    -   Regularly update summary tables or visuals from your database
+    -   Repeatedly web scraping Twitter
+    -   [Other ideas](https://code.tutsplus.com/tutorials/scheduling-tasks-with-cron-jobs--net-8800)\
+:::
+
+## First time setup
+
+1.  Open your Bash-compatible shell.\
+2.  List your current **crontab** *jobs* with the command `crontab -l`. You will see "no crontab for \[username\]" since you have no *jobs* yet.\
+3.  We edit our **crontab** with the following command.\
+    `crontab -e`
+
+## `crontab -e`
+
+![](imgs/sc1.png) ![](imgs/sc2-nano-editor.png)
+
+## Check that cron is running
+
+::: nonincremental
+-   Use `service cron status` (in the shell) to check if cron is actually running.
+    -   if you see: `* cron is running`, then you're good to move on
+    -   if you see: `* cron is not running`, then enter:
+        -   `service cron start`. Then re-check the status.
+-   This is crucial or else, even after updating your **crontab** file, your *jobs* won't run.
+:::
+
+## Syntax
+
+    # ┌───────────── minute (0 - 59)
+    # │ ┌───────────── hour (0 - 23)
+    # │ │ ┌───────────── day of the month (1 - 31)
+    # │ │ │ ┌───────────── month (1 - 12)
+    # │ │ │ │ ┌───────────── day of the week (0 - 6) (Sunday to Saturday;
+    # │ │ │ │ │                                 7 is also Sunday on some systems)
+    # │ │ │ │ │
+    # │ │ │ │ │
+    # * * * * * <command to execute>
+
+::: nonincremental
+-   Insert a number (within the ranges above) to specify. Leave as an `*` to denote that you want to include all of the values.\
+-   Include spaces between each character.
+-   Resource: <https://crontab.guru/>
+:::
+
+## Your first (cron) job
+
+::: nonincremental
+1.  Open bash compatible shell. Navigate to a directory and create an empty testfile:\
+    `cd DIR` to change directories, `touch filename.txt` to create empty text file.
+2.  `crontab -e` to edit the crontab
+3.  enter:
+:::
+
+`* * * * *` echo "This is a test" \>\> /mnt/c/Users/username/your-directory/testfile.txt
+
+::: nonicremental
+-   **(nano) Save: ctrl+O, enter, ctrl+X**. Exit w/out saving = ctrl+X\
+:::
+
+## Your first (cron) job, part 2
+
+::: nonicremental
+1.  Try `crontab -l` to see your *jobs* and ensure your change saved.
+2.  Navigate to "testfile.txt" in the shell and view its contents: `cat testfile.txt`
+
+-   Note: this file will continue updating every minute.
+:::
+
+## Advanced cron
+
+::: nonicremental
+-   It is recommended that you schedule your jobs using absolute paths rather than relative paths.\
+-   Presumably, this helps avoid errors & ensure that your jobs last over time.
+-   For example:
+    -   using `echo` versus `/usr/bin/echo`
+:::
+
+## Takeaways
+
+Cron has lots of potential to be useful. **It is also fully accessible from your terminal within R Studio**.
+
+::: nonincremental
+-   It is built for Linux and also appears to be popular in the MacOS community.\
+-   It is a bit trickier for Windows users. Windows created their own version of a job scheduler (the "Task Scheduler").
+    -   Windows users: May have to take some extra steps to make `cron` run by default. [Read here.](https://www.howtogeek.com/746532/how-to-launch-cron-automatically-in-wsl-on-windows-10-and-11/)\
+:::
+
+## Essential Commands
+
+::: nonicremental
+`crontab`
+
+-   `-u` : specify the user whose crontab you want to edit (ignore if you're the only user)\
+-   `-l` : display current crontab\
+-   `-e` : edit the current crontab\
+-   `-r` : remove the current crontab\
+:::
+
+## Resources
+
+[Crontab Guru](https://crontab.guru/)\
+[Crontab quick reference](https://www.adminschoice.com/crontab-quick-reference)\
+[Article - Cron Ubuntu Tutorial](https://www.digitalocean.com/community/tutorials/how-to-use-cron-to-automate-tasks-ubuntu-1804)\
+[Intro Article (from Grant)](https://ostechnix.com/a-beginners-guide-to-cron-jobs/)\
+[Intro Article (from Grant)](https://www.tecmint.com/create-and-manage-cron-jobs-on-linux/)\
+[Basic cron example - Video.](https://www.youtube.com/watch?v=v952m13p-b4&ab_channel=Linode)\
+[Schedule a Python script - Video.](https://www.youtube.com/watch?v=5bTkiV_Aadc&ab_channel=PythonEngineer)\
+[taskscheduleR - R package](https://anderfernandez.com/en/blog/how-to-automate-r-scripts-on-windows-and-mac/)\
+[Automate Your Workflow with GitHub Actions and Cron](https://ealizadeh.com/blog/automate-workflow-github-cron)\
+[Git commands in cron (with a .sh script)](https://stackoverflow.com/questions/39740151/git-commands-in-cron-job)
+
+Slides by Hans Elliott
+
+------------------------------------------------------------------------
